@@ -1,0 +1,73 @@
+#include <iostream>
+#include <Windows.h>
+#include <conio.h>
+
+using namespace std;
+
+const int TEXT_AREA_WIDTH = 24;
+const int TEXT_AREA_HEIGHT = 10;
+
+void clearTextArea() {
+    COORD pos;
+    pos.X = 5;
+    pos.Y = 3;
+    HANDLE console = GetStdHandle(STD_OUTPUT_HANDLE);
+    SetConsoleTextAttribute(console, BACKGROUND_GREEN | FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
+    for (int i = 0; i < TEXT_AREA_HEIGHT; ++i) {
+        SetConsoleCursorPosition(console, pos);
+        for (int j = 0; j < TEXT_AREA_WIDTH; ++j) {
+            cout << " ";
+            pos.X++;
+        }
+        pos.X = 5;
+        pos.Y++;
+    }
+    SetConsoleCursorPosition(console, { 5, 3 }); // Move cursor to start position of the text area
+    SetConsoleTextAttribute(console, BACKGROUND_GREEN | FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE); // Set text area color
+}
+
+void processInput() {
+    HANDLE console = GetStdHandle(STD_OUTPUT_HANDLE);
+    COORD pos = { 5, 3 }; // Start position of the text area
+    SetConsoleCursorPosition(console, pos);
+    while (true) {
+        int input = _getch();
+        if (input == 27) { // ESC key
+            cout << endl << "You came out, bye!" << endl;
+            break;
+        }
+        else if (input == 75) { // Left arrow key
+            if (pos.X > 5) {
+                pos.X--;
+                SetConsoleCursorPosition(console, pos);
+            }
+        }
+        else if (input == 77) { // Right arrow key
+            if (pos.X < 28) {
+                pos.X++;
+                SetConsoleCursorPosition(console, pos);
+            }
+        }
+        else if (input == 8) { // Backspace key
+            if (pos.X > 5) {
+                pos.X--;
+                SetConsoleCursorPosition(console, pos);
+                cout << " ";
+                SetConsoleCursorPosition(console, pos);
+            }
+        }
+        else if (input >= 32 && input <= 126) { // Printable ASCII characters
+            if (pos.X < 29) {
+                cout << (char)input;
+                pos.X++;
+                SetConsoleCursorPosition(console, pos);
+            }
+        }
+    }
+}
+
+int main() {
+    clearTextArea();
+    processInput();
+    return 0;
+}
